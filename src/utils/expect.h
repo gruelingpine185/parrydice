@@ -41,6 +41,9 @@ struct pd_expect_ctx {
     pd_expect_value value;
 };
 
+PD_C_DECLS_BEGIN
+const char* pd_expect_op_as_str(pd_expect_op _op);
+PD_C_DECLS_END
 
 #endif //SERT_H
 
