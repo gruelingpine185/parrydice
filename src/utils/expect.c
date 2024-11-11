@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <execinfo.h>
 
 #include "utils/expect.h"
@@ -44,22 +45,31 @@ void pd_expect(const char* _pathname, i32 _ln, pd_expect_ctx* _ctx) {
          _pathname,
         _ln,
         pd_expect_op_as_str(_ctx->op));
+    const i32 l_str_len = (i32) strlen(_ctx->l_as_str);
+    const i32 r_str_len = (i32) strlen(_ctx->r_as_str);
+    const i32 max_len = (l_str_len >= r_str_len)?
+        l_str_len: r_str_len;
+
     if(_ctx->type == PD_EXPECT_TYPE_PTR) {
         fprintf(
             stderr,
-            "  _l: %s (%p)\n"
-            "  _r: %s (%p)\n",
+            "  _l: %-*s (%p)\n"
+            "  _r: %-*s (%p)\n",
+            max_len,
             _ctx->l_as_str,
             _ctx->value.as_ptr.l,
+            max_len,
             _ctx->r_as_str,
             _ctx->value.as_ptr.r);
     } else {
         fprintf(
             stderr,
-            "  _l: %s (%d)\n"
-            "  _r: %s (%d)\n",
+            "  _l: %-*s (%d)\n"
+            "  _r: %-*s (%d)\n",
+            max_len,
             _ctx->l_as_str,
             _ctx->value.as_expr.l,
+            max_len,
             _ctx->r_as_str,
             _ctx->value.as_expr.r);
     }
