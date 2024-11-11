@@ -1,5 +1,5 @@
-#ifndef PD_ASSERT_H
-#define PD_ASSERT_H
+#ifndef PD_EXPECT_H
+#define PD_EXPECT_H
 
 #include "utils/defines.h"
 #include "utils/types.h"
@@ -149,4 +149,4 @@ const char* pd_expect_op_as_str(pd_expect_op _op);
 void pd_expect(const char* _pathname, i32 _ln, pd_expect_ctx* _ctx);
 PD_C_DECLS_END
 
-#endif //SERT_H
+#endif // PD_EXPECT_H
