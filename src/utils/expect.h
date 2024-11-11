@@ -43,6 +43,7 @@ struct pd_expect_ctx {
 
 PD_C_DECLS_BEGIN
 const char* pd_expect_op_as_str(pd_expect_op _op);
+void pd_expect(const char* _pathname, i32 _ln, pd_expect_ctx* _ctx);
 PD_C_DECLS_END
 
 #endif //SERT_H
