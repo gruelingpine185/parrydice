@@ -40,7 +40,7 @@ typedef enum {
     PD_EXPECT_OP_LT,
     PD_EXPECT_OP_GT,
     PD_EXPECT_OP_LTE,
-    PD_ASSRET_OP_GTE
+    PD_EXPECT_OP_GTE
 } pd_expect_op;
 
 typedef struct pd_expect_ctx pd_expect_ctx;
@@ -72,4 +72,3 @@ void pd_expect(const char* _pathname, i32 _ln, pd_expect_ctx* _ctx);
 PD_C_DECLS_END
 
 #endif //SERT_H
-
