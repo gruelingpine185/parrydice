@@ -103,8 +103,8 @@
 
 #define PD_expect_expr_in_range(_x, _min, _max) \
     do { \
-        if(!(_x > _min)) PD_expect_expr(_x, PD_EXPECT_OP_GT, _min); \
-        else if(!(_x < _max)) PD_expect_expr(_x, PD_EXPECT_OP_LT, _max); \
+        PD_expect_expr_gt(_x, _min); \
+        PD_expect_expr_lt(_x, _max); \
      } while(0)
 
 typedef enum {
