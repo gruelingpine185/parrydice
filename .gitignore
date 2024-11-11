@@ -5,7 +5,7 @@ bin/
 *.dSYM/
 
 # bear
-compile_comands.json
+compile_commands.json
 .cache/
 
 # macos
