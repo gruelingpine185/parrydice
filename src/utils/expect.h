@@ -29,6 +29,36 @@
         if(!(_l)) PD_expect_ptr(_l, PD_EXPECT_OP_NE, NULL); \
      } while(0)
 
+#define PD_expect_ptr_eq(_l, _r) \
+    do { \
+        if(!(_l)) PD_expect_ptr(_l, PD_EXPECT_OP_EQ, _r); \
+     } while(0)
+
+#define PD_expect_ptr_ne(_l, _r) \
+    do { \
+        if((_l) == (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_NE, _r); \
+     } while(0)
+
+#define PD_expect_ptr_lt(_l, _r) \
+    do { \
+        if((_l) >= (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_LT, _r); \
+     } while(0)
+
+#define PD_expect_ptr_gt(_l, _r) \
+    do { \
+        if((_l) <= (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_GT, _r); \
+     } while(0)
+
+#define PD_expect_ptr_lte(_l, _r) \
+    do { \
+        if((_l) > (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_LTE, _r); \
+     } while(0)
+
+#define PD_expect_ptr_gte(_l, _r) \
+    do { \
+        if((_l) < (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_GTE, _r); \
+     } while(0)
+
 typedef enum {
     PD_EXPECT_TYPE_PTR,
     PD_EXPECT_TYPE_EXPR
