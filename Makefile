@@ -6,7 +6,8 @@ project = $(bin_dir)/$(project_name)
 inc_dir = $(src_dir)
 src_dir := src
 bin_dir := bin
-bin_dirs := $(bin_dir) $(addprefix $(bin_dir)/, utils)
+vnd_dir := vendor
+bin_dirs := $(bin_dir) $(addprefix $(bin_dir)/, utils core)
 
 # sources
 headers := $(wildcard $(inc_dir)/*.h) $(wildcard $(inc_dir)/**/*.h)
@@ -17,17 +18,23 @@ objects := $(patsubst $(src_dir)/%.c,$(bin_dir)/%.o,$(sources))
 std = -std=c11
 opt = -O0 -g
 wrn = -Wall -Wextra -pedantic
-inc = -I$(inc_dir)
+inc = -I$(inc_dir) $(shell pkg-config --cflags glfw3)
 def =
 flags := $(strip $(std) $(opt) $(wrn) $(inc) $(def))
 
-.PHONY: all clean
+.PHONY: all clean deps_install deps_uninstall
 all: $(project)
 clean:
 	-rm -rf $(bin_dir)
+deps_install:
+	cd $(vnd_dir)/glfw; \
+	cmake -S . -B build
+	make -C $(vnd_dir)/glfw/build install
+deps_uninstall:
+	xargs rm < $(vnd_dir)/glfw/build/install_manifest.txt
 
 $(project): $(headers) $(sources) $(bin_dirs) $(objects)
-	$(CC) $(flags) $(objects) -o $@
+	$(CC) $(flags) $(objects) -o $@ $(shell pkg-config --libs --static glfw3)
 
 $(bin_dir)/%.o: $(src_dir)/%.c $(bin_dirs)
 	$(CC) $(flags) -c $< -o $@
