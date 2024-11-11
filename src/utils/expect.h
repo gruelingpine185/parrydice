@@ -19,6 +19,18 @@
         pd_expect(__FILE__, __LINE__, &ctx); \
     } while(0)
 
+#define PD_expect_expr(_l, _op, _r) \
+    do { \
+        pd_expect_ctx ctx = {0}; \
+        ctx.type = PD_EXPECT_TYPE_EXPR; \
+        ctx.op = _op; \
+        ctx.l_as_str = PD_stringify(_l); \
+        ctx.r_as_str = PD_stringify(_r); \
+        ctx.value.as_expr.l = _l; \
+        ctx.value.as_expr.r = _r; \
+        pd_expect(__FILE__, __LINE__, &ctx); \
+    } while(0)
+
 #define PD_expect_null(_l) \
     do { \
         if((_l)) PD_expect_ptr(_l, PD_EXPECT_OP_EQ, NULL); \
@@ -57,6 +69,42 @@
 #define PD_expect_ptr_gte(_l, _r) \
     do { \
         if((_l) < (_r)) PD_expect_ptr(_l, PD_EXPECT_OP_GTE, _r); \
+     } while(0)
+
+#define PD_expect_expr_eq(_l, _r) \
+    do { \
+        if((_l) != (_r)) PD_expect_expr(_l, PD_EXPECT_OP_EQ, _r); \
+     } while(0)
+
+#define PD_expect_expr_ne(_l, _r) \
+    do { \
+        if((_l) == (_r)) PD_expect_expr(_l, PD_EXPECT_OP_NE, _r); \
+     } while(0)
+
+#define PD_expect_expr_lt(_l, _r) \
+    do { \
+        if((_l) >= (_r)) PD_expect_expr(_l, PD_EXPECT_OP_LT, _r); \
+     } while(0)
+
+#define PD_expect_expr_gt(_l, _r) \
+    do { \
+        if((_l) <= (_r)) PD_expect_expr(_l, PD_EXPECT_OP_GT, _r); \
+     } while(0)
+
+#define PD_expect_expr_lte(_l, _r) \
+    do { \
+        if((_l) > (_r)) PD_expect_expr(_l, PD_EXPECT_OP_LTE, _r); \
+     } while(0)
+
+#define PD_expect_expr_gte(_l, _r) \
+    do { \
+        if((_l) < (_r)) PD_expect_expr(_l, PD_EXPECT_OP_GTE, _r); \
+     } while(0)
+
+#define PD_expect_expr_in_range(_x, _min, _max) \
+    do { \
+        if(!(_x > _min)) PD_expect_expr(_x, PD_EXPECT_OP_GT, _min); \
+        else if(!(_x < _max)) PD_expect_expr(_x, PD_EXPECT_OP_LT, _max); \
      } while(0)
 
 typedef enum {
