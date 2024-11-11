@@ -1,4 +1,6 @@
+#include <stdlib.h>
 #include <stdio.h>
+#include <execinfo.h>
 
 #include "utils/expect.h"
 
@@ -10,6 +12,26 @@ static const char* const expect_op_list[] = {
     "<=",
     ">="
 };
+
+static void pd_display_callstack(void);
+
+
+static void pd_display_callstack(void) {
+    void* array[10];
+    char** strings = NULL;
+    int size, i;
+
+    size = backtrace(array, 10);
+    strings = backtrace_symbols(array, size);
+    if(!strings) return;
+
+    // discards call to this function
+    for(i = 1; i < size; i++) {
+        printf("frame: #%s\n", strings[i]);
+    }
+
+    free(strings);
+}
 
 const char* pd_expect_op_as_str(pd_expect_op _op) {
     return expect_op_list[_op];
@@ -41,5 +63,8 @@ void pd_expect(const char* _pathname, i32 _ln, pd_expect_ctx* _ctx) {
             _ctx->r_as_str,
             _ctx->value.as_expr.r);
     }
+
+    printf("\n");
+    pd_display_callstack();
     exit(1);
 }
