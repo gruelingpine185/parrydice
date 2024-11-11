@@ -4,6 +4,31 @@
 #include "utils/defines.h"
 #include "utils/types.h"
 
+#define PD_expect_ptr(_l, _op, _r) \
+    do { \
+        const char* null_str = "NULL"; \
+        pd_expect_ctx ctx = {0}; \
+        ctx.type = PD_EXPECT_TYPE_PTR; \
+        ctx.op = _op; \
+        ctx.l_as_str = (!_l)? \
+            null_str: PD_stringify(_l); \
+        ctx.r_as_str = (!_r)? \
+            null_str: PD_stringify(_r); \
+        ctx.value.as_ptr.l = _l; \
+        ctx.value.as_ptr.r = _r; \
+        pd_expect(__FILE__, __LINE__, &ctx); \
+    } while(0)
+
+#define PD_expect_null(_l) \
+    do { \
+        if((_l)) PD_expect_ptr(_l, PD_EXPECT_OP_EQ, NULL); \
+     } while(0)
+
+#define PD_expect_nonnull(_l) \
+    do { \
+        if(!(_l)) PD_expect_ptr(_l, PD_EXPECT_OP_NE, NULL); \
+     } while(0)
+
 typedef enum {
     PD_EXPECT_TYPE_PTR,
     PD_EXPECT_TYPE_EXPR
