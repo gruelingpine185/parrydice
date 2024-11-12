@@ -9,6 +9,7 @@
 
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
+static b32 vk_r_supported_exts(pd_darray* _exts);
 static void vk_application_info_init(VkApplicationInfo* _app_info,
                                      const char* _app_name);
 static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
@@ -44,7 +45,34 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
     return pd_darray_append(_layers, (void*) layer);
 }
 
+static b32 vk_r_supported_exts(pd_darray* _exts) {
+    u32 property_count = 0;
+    VkResult res = vkEnumerateInstanceExtensionProperties(
+        VK_NULL_HANDLE,
+        &property_count,
+        VK_NULL_HANDLE);
+    if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
+
+    VkExtensionProperties* props =
+        (VkExtensionProperties*) malloc(sizeof(*props) * property_count);
+    if(!props) return 0;
+
+    res = vkEnumerateInstanceExtensionProperties(
+        VK_NULL_HANDLE,
+        &property_count,
+        props);
+    if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
+
+    if(!pd_darray_init(_exts, property_count)) return 0;
+
+    for(u32 i = 0; i < property_count; i++) {
+        const char* ext = strdup(props[i].extensionName);
+        if(!ext) return 0;
+        if(!pd_darray_append(_exts, (void*) ext)) return 0;
     }
+
+    free(props);
+    return 1;
 }
 
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
