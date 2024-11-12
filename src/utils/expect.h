@@ -34,12 +34,12 @@
 
     #define PD_expect_null(_l) \
         do { \
-            if((_l)) PD_expect_ptr(_l, PD_EXPECT_OP_EQ, NULL); \
+            if((void*) (_l)) PD_expect_ptr((void*) _l, PD_EXPECT_OP_EQ, NULL); \
          } while(0)
 
     #define PD_expect_nonnull(_l) \
         do { \
-            if(!(_l)) PD_expect_ptr(_l, PD_EXPECT_OP_NE, NULL); \
+            if(!((void*) _l)) PD_expect_ptr((void*) _l, PD_EXPECT_OP_NE, NULL); \
          } while(0)
 
     #define PD_expect_ptr_eq(_l, _r) \
