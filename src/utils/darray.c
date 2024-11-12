@@ -17,10 +17,12 @@ static b32 pd_darray_resize(pd_darray* _arr) {
     return 1;
 }
 
-b32 pd_darray_init(pd_darray* _arr) {
+b32 pd_darray_init(pd_darray* _arr, usize _cap) {
     PD_expect_nonnull(_arr);
 
-    _arr->cap = 16;
+    _arr->cap = (_cap)?
+        _cap: 16;
+
     _arr->data = (void**) malloc(sizeof(void*) * _arr->cap);
     if(!_arr->data) return 0;
 
