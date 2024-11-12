@@ -19,7 +19,6 @@ static b32 pd_darray_resize(pd_darray* _arr) {
 
 b32 pd_darray_init(pd_darray* _arr, usize _cap) {
     PD_expect_nonnull(_arr);
-
     _arr->cap = (_cap)?
         _cap: 16;
 
@@ -59,6 +58,31 @@ void* pd_darray_at(const pd_darray* _arr, usize _idx) {
     PD_expect_expr_gte(_idx, 0);
     PD_expect_expr_lt(_idx, pd_darray_r_cap(_arr));
     return _arr->data[_idx];
+}
+
+b32 pd_darray_contains_array(const pd_darray* _arr,
+                             const pd_darray* _target,
+                             pd_darray_is_equal_fn _cb) {
+    PD_expect_nonnull(_arr);
+    PD_expect_nonnull(_target);
+    PD_expect_nonnull(_cb);
+    const void* arr_item = NULL;
+    const void* target_item = NULL;
+    for(u32 i = 0; i < pd_darray_r_size(_target); i++) {
+        b32 is_found = 0;
+        target_item = pd_darray_at(_target, i);
+        for(u32 j = 0; j < pd_darray_r_size(_arr); j++) {
+            arr_item = pd_darray_at(_target, j);
+            if(_cb(arr_item, target_item)) {
+                is_found = 1;
+                break;
+            }
+        }
+
+        if(!is_found) return 0;
+    }
+
+    return 1;
 }
 
 b32 pd_darray_is_empty(const pd_darray* _arr) {
