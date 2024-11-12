@@ -198,9 +198,6 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
 
 static b32 vk_create_instance(VkInstance* _instance) {
     PD_expect_nonnull(_instance);
-    VkApplicationInfo app_info;
-    vk_application_info_init(&app_info, "Parrydice");
-
     pd_darray exts;
     if(!vk_r_instance_exts(&exts)) return 0;
 
@@ -223,6 +220,8 @@ static b32 vk_create_instance(VkInstance* _instance) {
     pd_darray_deinit_all(&supported_exts);
     pd_darray_deinit_all(&supported_layers);
 
+    VkApplicationInfo app_info;
+    vk_application_info_init(&app_info, "Parrydice");
     VkInstanceCreateInfo create_info;
     vk_instance_create_info_init(&create_info, &app_info, &exts, &layers);
     VkResult res = vkCreateInstance(&create_info, VK_NULL_HANDLE, _instance);
