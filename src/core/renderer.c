@@ -94,16 +94,12 @@ static b32 vk_r_supported_exts(pd_darray* _exts) {
         VK_NULL_HANDLE);
     if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
 
-    VkExtensionProperties* props =
-        (VkExtensionProperties*) malloc(sizeof(*props) * property_count);
-    if(!props) return 0;
-
+    VkExtensionProperties props[property_count];
     res = vkEnumerateInstanceExtensionProperties(
         VK_NULL_HANDLE,
         &property_count,
         props);
     if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
-
     if(!pd_darray_init(_exts, property_count)) return 0;
 
     for(u32 i = 0; i < property_count; i++) {
@@ -112,7 +108,6 @@ static b32 vk_r_supported_exts(pd_darray* _exts) {
         if(!pd_darray_append(_exts, (void*) ext)) return 0;
     }
 
-    free(props);
     return 1;
 }
 
@@ -124,10 +119,7 @@ static b32 vk_r_supported_layers(pd_darray* _layers) {
         VK_NULL_HANDLE);
     if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
 
-    VkLayerProperties* props =
-        (VkLayerProperties*) malloc(sizeof(*props) * property_count);
-    if(!props) return 0;
-
+    VkLayerProperties props[property_count];
     res = vkEnumerateInstanceLayerProperties(&property_count, props);
     if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
     if(!pd_darray_init(_layers, property_count)) return 0;
@@ -138,7 +130,6 @@ static b32 vk_r_supported_layers(pd_darray* _layers) {
         if(!pd_darray_append(_layers, (void*) layer)) return 0;
     }
 
-    free(props);
     return 1;
 }
 
