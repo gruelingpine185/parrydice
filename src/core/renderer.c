@@ -179,7 +179,7 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
     _create_info->pNext = VK_NULL_HANDLE;
     _create_info->pApplicationInfo = _app_info;
 #if __APPLE__
-    _create_info->flags |= VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
+    _create_info->flags = VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR;
 #else
     _create_info->flags = 0;
 #endif // __APPLE__
