@@ -38,12 +38,21 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
     const char** glfw_exts = glfwGetRequiredInstanceExtensions(&count);
     if(!glfw_exts) return 0;
 
+#if __APPLE__
+    if(!pd_darray_init(_exts, count + 1)) return 0;
+#else
+    if(!pd_darray_init(_exts, count)) return 0;
+#endif // __APPLE__
+
+    const char* ext = NULL;
     for(u32 i = 0; i < count; i++) {
-        if(!pd_darray_append(_exts, (void*) glfw_exts[i])) return 0;
+        ext = strdup(glfw_exts[i]);
+        if(!ext) return 0;
+        if(!pd_darray_append(_exts, (void*) ext)) return 0;
     }
 
 #if __APPLE__
-    const char* ext = strdup(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    ext = strdup(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     if(!ext) return 0;
     if(!pd_darray_append(_exts, (void*) ext)) return 0;
 #endif // __APPLE__
@@ -53,6 +62,9 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 
 static b32 vk_r_instance_layers(pd_darray* _layers) {
     PD_expect_nonnull(_layers);
+    const u32 count = 1;
+    if(!pd_darray_init(_layers, count)) return 0;
+
     const char* layer = strdup("VK_LAYER_KHRONOS_validation");
     if(!layer) return 0;
 
@@ -188,15 +200,11 @@ static b32 vk_create_instance(VkInstance* _instance) {
     vk_application_info_init(&app_info, "Parrydice");
 
     pd_darray exts;
-    if(!pd_darray_init(&exts, 0)) return 0;
     if(!vk_r_instance_exts(&exts)) return 0;
 
     pd_darray layers;
-    if(!pd_darray_init(&layers, 0)) return 0;
     if(!vk_r_instance_layers(&layers)) return 0;
 
-    VkInstanceCreateInfo create_info;
-    vk_instance_create_info_init(&create_info, &app_info, &exts, NULL);
     pd_darray supported_exts;
     if(!vk_r_supported_exts(&supported_exts)) return 0;
     if(!vk_are_required_exts_present(&supported_exts, &exts)) return 0;
@@ -210,22 +218,16 @@ static b32 vk_create_instance(VkInstance* _instance) {
     vk_print_str_darray(&layers, "Requested Validation Layers:");
     vk_print_str_darray(&supported_exts, "Supported Extensions:");
     vk_print_str_darray(&supported_layers, "Supported Layers:");
-    for(u32 i = 0; i < pd_darray_r_size(&supported_exts); i++) {
-        free(pd_darray_at(&supported_exts, i));
-    }
+    pd_darray_deinit_all(&supported_exts);
+    pd_darray_deinit_all(&supported_layers);
 
-    // TODO: figure out a good way to delete darrays
-    pd_darray_deinit(&supported_exts);
-    pd_darray_deinit(&supported_layers);
+    VkInstanceCreateInfo create_info;
+    vk_instance_create_info_init(&create_info, &app_info, &exts, NULL);
     VkResult res = vkCreateInstance(&create_info, VK_NULL_HANDLE, _instance);
     if(res != VK_SUCCESS) return 0;
 
-    pd_darray_deinit(&exts);
-    for(u32 i = 0; i < pd_darray_r_size(&layers); i++) {
-        free(pd_darray_at(&layers, i));
-    }
-
-    pd_darray_deinit(&layers);
+    pd_darray_deinit_all(&exts);
+    pd_darray_deinit_all(&layers);
     return 1;
 }
 
