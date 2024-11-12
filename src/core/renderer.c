@@ -79,6 +79,8 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
 
     return pd_darray_append(_layers, (void*) layer);
 #else
+    // TODO: modify initializer to prevent nullptr dereference  
+    _layers->size = 0;
     return 1;
 #endif // PD_USE_DEBUG
 }
