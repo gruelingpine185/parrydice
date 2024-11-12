@@ -9,8 +9,6 @@
 
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
-static void vk_print_instance_exts(const pd_darray* _exts);
-static void vk_print_instance_layers(const pd_darray* _layers);
 static void vk_application_info_init(VkApplicationInfo* _app_info,
                                      const char* _app_name);
 static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
@@ -46,19 +44,15 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
     return pd_darray_append(_layers, (void*) layer);
 }
 
-static void vk_print_instance_exts(const pd_darray* _exts) {
-    PD_expect_nonnull(_exts);
-    printf("Extensions:\n");
-    for(u32 i = 0; i < pd_darray_r_size(_exts); i++) {
-        printf("  %d: %s\n", i, (const char*) pd_darray_at(_exts, i));
     }
 }
 
-static void vk_print_instance_layers(const pd_darray* _layers) {
-    PD_expect_nonnull(_layers);
-    printf("Layers:\n");
-    for(u32 i = 0; i < pd_darray_r_size(_layers); i++) {
-        printf("  %d: %s\n", i, (const char*) pd_darray_at(_layers, i));
+static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
+    PD_expect_nonnull(_arr);
+    if(_title) printf("%s\n", _title);
+
+    for(u32 i = 0; i < pd_darray_r_size(_arr); i++) {
+        printf("  %s\n", (const char*) pd_darray_at(_arr, i));
     }
 }
 
