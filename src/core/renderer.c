@@ -48,7 +48,7 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 
     const char* ext = NULL;
 #if PD_USE_DEBUG
-    ext = strdup(VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
+    ext = strdup(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     if(!ext) return 0;
     if(!pd_darray_append(_exts, (void*) ext)) return 0;
 #endif // PD_USE_DEBUG
