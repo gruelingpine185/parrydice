@@ -12,6 +12,7 @@
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
 static b32 vk_r_supported_exts(pd_darray* _exts);
+static b32 vk_r_supported_layers(pd_darray* _layers);
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
 static b32 vk_is_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts);
@@ -52,6 +53,7 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
 }
 
 static b32 vk_r_supported_exts(pd_darray* _exts) {
+    PD_expect_nonnull(_exts);
     u32 property_count = 0;
     VkResult res = vkEnumerateInstanceExtensionProperties(
         VK_NULL_HANDLE,
@@ -75,6 +77,32 @@ static b32 vk_r_supported_exts(pd_darray* _exts) {
         const char* ext = strdup(props[i].extensionName);
         if(!ext) return 0;
         if(!pd_darray_append(_exts, (void*) ext)) return 0;
+    }
+
+    free(props);
+    return 1;
+}
+
+static b32 vk_r_supported_layers(pd_darray* _layers) {
+    PD_expect_nonnull(_layers);
+    u32 property_count = 0;
+    VkResult res = vkEnumerateInstanceLayerProperties(
+        &property_count,
+        VK_NULL_HANDLE);
+    if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
+
+    VkLayerProperties* props =
+        (VkLayerProperties*) malloc(sizeof(*props) * property_count);
+    if(!props) return 0;
+
+    res = vkEnumerateInstanceLayerProperties(&property_count, props);
+    if((res != VK_SUCCESS) && (res != VK_INCOMPLETE)) return 0;
+    if(!pd_darray_init(_layers, property_count)) return 0;
+
+    for(u32 i = 0; i < property_count; i++) {
+        const char* layer = strdup(props[i].layerName);
+        if(!layer) return 0;
+        if(!pd_darray_append(_layers, (void*) layer)) return 0;
     }
 
     free(props);
@@ -171,15 +199,21 @@ static b32 vk_create_instance(VkInstance* _instance) {
     if(!vk_r_supported_exts(&supported_exts)) return 0;
     if(!vk_is_required_exts_present(&supported_exts, &exts)) return 0;
 
+    pd_darray supported_layers;
+    if(!vk_r_supported_layers(&supported_layers)) return 0;
+
     // TODO: add debug macros to disable functions
     vk_print_str_darray(&exts, "Required Extensions:");
     vk_print_str_darray(&layers, "Requested Validation Layers:");
     vk_print_str_darray(&supported_exts, "Supported Extensions:");
+    vk_print_str_darray(&supported_layers, "Supported Layers:");
     for(u32 i = 0; i < pd_darray_r_size(&supported_exts); i++) {
         free(pd_darray_at(&supported_exts, i));
     }
 
+    // TODO: figure out a good way to delete darrays
     pd_darray_deinit(&supported_exts);
+    pd_darray_deinit(&supported_layers);
     VkResult res = vkCreateInstance(&create_info, VK_NULL_HANDLE, _instance);
     if(res != VK_SUCCESS) return 0;
 
@@ -188,7 +222,6 @@ static b32 vk_create_instance(VkInstance* _instance) {
         free(pd_darray_at(&layers, i));
     }
 
-    // TODO: figure out a good way to delete layers
     pd_darray_deinit(&layers);
     return 1;
 }
