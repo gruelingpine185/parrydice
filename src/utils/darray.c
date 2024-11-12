@@ -35,6 +35,16 @@ void pd_darray_deinit(pd_darray* _arr) {
     free(_arr->data);
 }
 
+void pd_darray_deinit_all(pd_darray* _arr) {
+    PD_expect_nonnull(_arr);
+    PD_expect_nonnull(_arr->data);
+    for(u32 i = 0; i < pd_darray_r_size(_arr); i++) {
+        free(pd_darray_at(_arr, i));
+    }
+
+    free(_arr->data);
+}
+
 b32 pd_darray_append(pd_darray* _arr, void* _data) {
     PD_expect_nonnull(_arr);
     PD_expect_nonnull(_arr->data);
