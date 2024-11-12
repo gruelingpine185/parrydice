@@ -20,6 +20,7 @@ opt = -O0 -g
 wrn = -Wall -Wextra -pedantic
 inc = -I$(inc_dir) $(shell pkg-config --cflags glfw3)
 def =
+libs := $(shell pkg-config --libs --static glfw3) -Wl,-rpath,/usr/local/lib -lvulkan
 flags := $(strip $(std) $(opt) $(wrn) $(inc) $(def))
 
 .PHONY: all clean deps_install deps_uninstall
@@ -34,7 +35,7 @@ deps_uninstall:
 	xargs rm < $(vnd_dir)/glfw/build/install_manifest.txt
 
 $(project): $(headers) $(sources) $(bin_dirs) $(objects)
-	$(CC) $(flags) $(objects) -o $@ $(shell pkg-config --libs --static glfw3)
+	$(CC) $(flags) $(objects) -o $@ $(libs)
 
 $(bin_dir)/%.o: $(src_dir)/%.c $(bin_dirs)
 	$(CC) $(flags) -c $< -o $@
