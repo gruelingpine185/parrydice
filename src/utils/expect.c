@@ -18,11 +18,12 @@ static void pd_display_callstack(void);
 
 
 static void pd_display_callstack(void) {
-    void* array[10];
+    const u32 max_frames = 16;
+    void* array[max_frames];
     char** strings = NULL;
     int size, i;
 
-    size = backtrace(array, 10);
+    size = backtrace(array, max_frames);
     strings = backtrace_symbols(array, size);
     if(!strings) return;
 
