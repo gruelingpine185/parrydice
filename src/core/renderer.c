@@ -7,6 +7,7 @@
 
 #include "utils/expect.h"
 #include "utils/darray.h"
+#include "core/renderer.h"
 
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
@@ -190,4 +191,16 @@ static b32 vk_create_instance(VkInstance* _instance) {
     // TODO: figure out a good way to delete layers
     pd_darray_deinit(&layers);
     return 1;
+}
+
+b32 pd_renderer_init(pd_renderer* _renderer) {
+    PD_expect_nonnull(_renderer);
+    if(!vk_create_instance(&_renderer->instance)) return 0;
+
+    return 1;
+}
+
+void pd_renderer_deinit(pd_renderer* _renderer) {
+    PD_expect_nonnull(_renderer);
+    vkDestroyInstance(_renderer->instance, VK_NULL_HANDLE);
 }
