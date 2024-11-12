@@ -38,7 +38,7 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 
 static b32 vk_r_instance_layers(pd_darray* _layers) {
     PD_expect_nonnull(_layers);
-    const char* layer = strdup("VK_EXT_debug_utils");
+    const char* layer = strdup("VK_LAYER_KHRONOS_validation");
     if(!layer) return 0;
 
     return pd_darray_append(_layers, (void*) layer);
