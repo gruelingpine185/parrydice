@@ -9,6 +9,7 @@
 #include "utils/darray.h"
 #include "core/renderer.h"
 
+static b32 pd_darray_is_str_eq(const void* _l, const void* _r);
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
 static b32 vk_r_supported_exts(pd_darray* _exts);
@@ -16,6 +17,8 @@ static b32 vk_r_supported_layers(pd_darray* _layers);
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
 static b32 vk_is_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts);
+static b32 vk_is_requested_layers_present(const pd_darray* _supported_layers,
+                                          const pd_darray* _req_layers);
 static void vk_application_info_init(VkApplicationInfo* _app_info,
                                      const char* _app_name);
 static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
@@ -24,6 +27,10 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
                                          const pd_darray* _layers);
 static b32 vk_create_instance(VkInstance* _instance);
 
+
+static b32 pd_darray_is_str_eq(const void* _l, const void* _r) {
+    return (strcmp((const char*) _l, (const char*) _r) == 0);
+}
 
 static b32 vk_r_instance_exts(pd_darray* _exts) {
     PD_expect_nonnull(_exts);
@@ -124,23 +131,18 @@ static b32 vk_is_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts) {
     PD_expect_nonnull(_supported_exts);
     PD_expect_nonnull(_req_exts);
-    const char* prop_ext = NULL;
-    const char* req_ext = NULL;
-    for(u32 i = 0; i < pd_darray_r_size(_req_exts); i++) {
-        b32 is_found = 0;
-        req_ext = (const char*) pd_darray_at(_req_exts, i);
-        for(u32 j = 0; j < pd_darray_r_size(_supported_exts); j++) {
-            prop_ext = (const char*) pd_darray_at(_supported_exts, j);
-            if(strcmp(req_ext, prop_ext) == 0) {
-                is_found = 1;
-                break;
-            }
-        }
+    return pd_darray_contains_array(
+        _supported_exts, _req_exts,
+        &pd_darray_is_str_eq);
+}
 
-        if(!is_found) return 0;
-    }
-
-    return 1;
+static b32 vk_is_requested_layers_present(const pd_darray* _supported_layers,
+                                          const pd_darray* _req_layers) {
+    PD_expect_nonnull(_supported_layers);
+    PD_expect_nonnull(_req_layers);
+    return pd_darray_contains_array(
+        _supported_layers, _req_layers,
+        &pd_darray_is_str_eq);
 }
 
 static void vk_application_info_init(VkApplicationInfo* _app_info,
@@ -201,6 +203,7 @@ static b32 vk_create_instance(VkInstance* _instance) {
 
     pd_darray supported_layers;
     if(!vk_r_supported_layers(&supported_layers)) return 0;
+    if(!vk_is_requested_layers_present(&supported_layers, &layers)) return 0;
 
     // TODO: add debug macros to disable functions
     vk_print_str_darray(&exts, "Required Extensions:");
