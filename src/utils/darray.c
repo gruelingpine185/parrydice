@@ -9,7 +9,7 @@ static b32 pd_darray_resize(pd_darray* _arr);
 static b32 pd_darray_resize(pd_darray* _arr) {
     const f32 resize_factor = 1.61f;
     const usize new_cap = pd_darray_r_cap(_arr) * resize_factor;
-    void** tmp = (void**) realloc(&_arr->data, (sizeof(void*) * new_cap));
+    void** tmp = (void**) realloc(_arr->data, (sizeof(void*) * new_cap));
     if(!tmp) return 0;
 
     _arr->data = tmp;
@@ -58,7 +58,7 @@ b32 pd_darray_append(pd_darray* _arr, void* _data) {
 
     if(!pd_darray_resize(_arr)) return 0;
 
-    _arr->data[++_arr->size] = _data;
+    _arr->data[_arr->size++] = _data;
     return 1;
 }
 
