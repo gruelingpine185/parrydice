@@ -188,7 +188,7 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
         (const char**) pd_darray_r_data(_exts);
     if(_layers) {
         _create_info->enabledLayerCount = pd_darray_r_size(_layers);
-        _create_info->ppEnabledExtensionNames =
+        _create_info->ppEnabledLayerNames =
             (const char**) pd_darray_r_data(_layers);
     } else {
         _create_info->enabledLayerCount = 0;
@@ -224,7 +224,7 @@ static b32 vk_create_instance(VkInstance* _instance) {
     pd_darray_deinit_all(&supported_layers);
 
     VkInstanceCreateInfo create_info;
-    vk_instance_create_info_init(&create_info, &app_info, &exts, NULL);
+    vk_instance_create_info_init(&create_info, &app_info, &exts, &layers);
     VkResult res = vkCreateInstance(&create_info, VK_NULL_HANDLE, _instance);
     if(res != VK_SUCCESS) return 0;
 
