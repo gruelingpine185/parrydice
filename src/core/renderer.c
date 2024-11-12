@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -19,6 +20,7 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
                                          const VkApplicationInfo* _app_info,
                                          const pd_darray* _exts,
                                          const pd_darray* _layers);
+static b32 vk_create_instance(VkInstance* _instance);
 
 
 static b32 vk_r_instance_exts(pd_darray* _exts) {
@@ -147,4 +149,45 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
         _create_info->enabledLayerCount = 0;
         _create_info->ppEnabledLayerNames = VK_NULL_HANDLE;
     }
+}
+
+static b32 vk_create_instance(VkInstance* _instance) {
+    PD_expect_nonnull(_instance);
+    VkApplicationInfo app_info;
+    vk_application_info_init(&app_info, "Parrydice");
+
+    pd_darray exts;
+    if(!pd_darray_init(&exts, 0)) return 0;
+    if(!vk_r_instance_exts(&exts)) return 0;
+
+    pd_darray layers;
+    if(!pd_darray_init(&layers, 0)) return 0;
+    if(!vk_r_instance_layers(&layers)) return 0;
+
+    VkInstanceCreateInfo create_info;
+    vk_instance_create_info_init(&create_info, &app_info, &exts, NULL);
+    pd_darray supported_exts;
+    if(!vk_r_supported_exts(&supported_exts)) return 0;
+    if(!vk_is_required_exts_present(&supported_exts, &exts)) return 0;
+
+    // TODO: add debug macros to disable functions
+    vk_print_str_darray(&exts, "Required Extensions:");
+    vk_print_str_darray(&layers, "Requested Validation Layers:");
+    vk_print_str_darray(&supported_exts, "Supported Extensions:");
+    for(u32 i = 0; i < pd_darray_r_size(&supported_exts); i++) {
+        free(pd_darray_at(&supported_exts, i));
+    }
+
+    pd_darray_deinit(&supported_exts);
+    VkResult res = vkCreateInstance(&create_info, VK_NULL_HANDLE, _instance);
+    if(res != VK_SUCCESS) return 0;
+
+    pd_darray_deinit(&exts);
+    for(u32 i = 0; i < pd_darray_r_size(&layers); i++) {
+        free(pd_darray_at(&layers, i));
+    }
+
+    // TODO: figure out a good way to delete layers
+    pd_darray_deinit(&layers);
+    return 1;
 }
