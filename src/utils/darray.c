@@ -33,3 +33,35 @@ void pd_darray_deinit(pd_darray* _arr) {
     PD_expect_nonnull(_arr->data);
     free(_arr->data);
 }
+
+void* pd_darray_at(const pd_darray* _arr, usize _idx) {
+    PD_expect_nonnull(_arr);
+    PD_expect_nonnull(_arr->data);
+    PD_expect_expr_gte(_idx, 0);
+    PD_expect_expr_lt(_idx, pd_darray_r_cap(_arr));
+    return _arr->data[_idx];
+}
+
+b32 pd_darray_is_empty(const pd_darray* _arr) {
+    PD_expect_nonnull(_arr);
+    return (pd_darray_r_size(_arr) == 0);
+}
+
+b32 pd_darray_is_full(const pd_darray* _arr) {
+    return (pd_darray_r_size(_arr) == pd_darray_r_cap(_arr));
+}
+
+void** pd_darray_r_data(const pd_darray* _arr) {
+    PD_expect_nonnull(_arr);
+    return _arr->data;
+}
+
+usize pd_darray_r_size(const pd_darray* _arr) {
+    PD_expect_nonnull(_arr);
+    return _arr->size;
+}
+
+usize pd_darray_r_cap(const pd_darray* _arr) {
+    PD_expect_nonnull(_arr);
+    return _arr->cap;
+}
