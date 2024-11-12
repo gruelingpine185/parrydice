@@ -10,6 +10,7 @@
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
 static b32 vk_r_supported_exts(pd_darray* _exts);
+static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
 static void vk_application_info_init(VkApplicationInfo* _app_info,
                                      const char* _app_name);
 static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
@@ -82,6 +83,9 @@ static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
     for(u32 i = 0; i < pd_darray_r_size(_arr); i++) {
         printf("  %s\n", (const char*) pd_darray_at(_arr, i));
     }
+
+    printf("\n");
+}
 }
 
 static void vk_application_info_init(VkApplicationInfo* _app_info,
