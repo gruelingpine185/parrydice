@@ -14,7 +14,9 @@ static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
 static b32 vk_r_supported_exts(pd_darray* _exts);
 static b32 vk_r_supported_layers(pd_darray* _layers);
+#if PD_USE_DEBUG
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
+#endif // PD_USE_DEBUG
 static b32 vk_are_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts);
 static b32 vk_are_requested_layers_present(const pd_darray* _supported_layers,
@@ -45,6 +47,12 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 #endif // __APPLE__
 
     const char* ext = NULL;
+#if PD_USE_DEBUG
+    ext = strdup(VK_EXT_DEBUG_UTILS_EXTENSION_NAME );
+    if(!ext) return 0;
+    if(!pd_darray_append(_exts, (void*) ext)) return 0;
+#endif // PD_USE_DEBUG
+
     for(u32 i = 0; i < count; i++) {
         ext = strdup(glfw_exts[i]);
         if(!ext) return 0;
@@ -62,13 +70,17 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 
 static b32 vk_r_instance_layers(pd_darray* _layers) {
     PD_expect_nonnull(_layers);
+#if PD_USE_DEBUG
     const u32 count = 1;
-    if(!pd_darray_init(_layers, count)) return 0;
+   if(!pd_darray_init(_layers, count)) return 0;
 
     const char* layer = strdup("VK_LAYER_KHRONOS_validation");
     if(!layer) return 0;
 
     return pd_darray_append(_layers, (void*) layer);
+#else
+    return 1;
+#endif // PD_USE_DEBUG
 }
 
 static b32 vk_r_supported_exts(pd_darray* _exts) {
@@ -128,6 +140,7 @@ static b32 vk_r_supported_layers(pd_darray* _layers) {
     return 1;
 }
 
+#if PD_USE_DEBUG
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
     PD_expect_nonnull(_arr);
     if(_title) printf("%s\n", _title);
@@ -138,6 +151,7 @@ static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
 
     printf("\n");
 }
+#endif // PD_USE_DEBUG
 
 static b32 vk_are_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts) {
@@ -152,9 +166,13 @@ static b32 vk_are_requested_layers_present(const pd_darray* _supported_layers,
                                           const pd_darray* _req_layers) {
     PD_expect_nonnull(_supported_layers);
     PD_expect_nonnull(_req_layers);
-    return pd_darray_contains_array(
-        _supported_layers, _req_layers,
-        &pd_darray_is_str_eq);
+    return (pd_darray_r_size(_req_layers) > 0)?
+        pd_darray_contains_array(
+            _supported_layers,
+            _req_layers,
+            &pd_darray_is_str_eq):
+        1;
+        
 }
 
 static void vk_application_info_init(VkApplicationInfo* _app_info,
@@ -186,8 +204,9 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
     _create_info->enabledExtensionCount = pd_darray_r_size(_exts);
     _create_info->ppEnabledExtensionNames =
         (const char**) pd_darray_r_data(_exts);
-    if(_layers) {
-        _create_info->enabledLayerCount = pd_darray_r_size(_layers);
+    const u32 layer_count = pd_darray_r_size(_layers);
+    if(layer_count) {
+        _create_info->enabledLayerCount = layer_count;
         _create_info->ppEnabledLayerNames =
             (const char**) pd_darray_r_data(_layers);
     } else {
@@ -212,13 +231,14 @@ static b32 vk_create_instance(VkInstance* _instance) {
     if(!vk_r_supported_layers(&supported_layers)) return 0;
     if(!vk_are_requested_layers_present(&supported_layers, &layers)) return 0;
 
-    // TODO: add debug macros to disable functions
+#if PD_USE_DEBUG
     vk_print_str_darray(&exts, "Required Extensions:");
     vk_print_str_darray(&layers, "Requested Validation Layers:");
     vk_print_str_darray(&supported_exts, "Supported Extensions:");
     vk_print_str_darray(&supported_layers, "Supported Layers:");
     pd_darray_deinit_all(&supported_exts);
     pd_darray_deinit_all(&supported_layers);
+#endif // PD_USE_DEBUG
 
     VkApplicationInfo app_info;
     vk_application_info_init(&app_info, "Parrydice");

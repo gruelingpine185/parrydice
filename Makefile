@@ -19,7 +19,7 @@ std = -std=c11
 opt = -O0 -g
 wrn = -Wall -Wextra -pedantic
 inc = -I$(inc_dir) $(shell pkg-config --cflags glfw3)
-def =
+def ?= -DPD_USE_DEBUG=1 -DPD_USE_EXPECT=1
 libs := $(shell pkg-config --libs --static glfw3) -Wl,-rpath,/usr/local/lib -lvulkan
 flags := $(strip $(std) $(opt) $(wrn) $(inc) $(def))
 
