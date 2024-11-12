@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <string.h>
 
 #include <GLFW/glfw3.h>
@@ -8,6 +9,8 @@
 
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
+static void vk_print_instance_exts(const pd_darray* _exts);
+static void vk_print_instance_layers(const pd_darray* _layers);
 
 
 static b32 vk_r_instance_exts(pd_darray* _exts) {
@@ -35,4 +38,20 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
     if(!layer) return 0;
 
     return pd_darray_append(_layers, (void*) layer);
+}
+
+static void vk_print_instance_exts(const pd_darray* _exts) {
+    PD_expect_nonnull(_exts);
+    printf("Extensions:\n");
+    for(u32 i = 0; i < pd_darray_r_size(_exts); i++) {
+        printf("  %d: %s\n", i, (const char*) pd_darray_at(_exts, i));
+    }
+}
+
+static void vk_print_instance_layers(const pd_darray* _layers) {
+    PD_expect_nonnull(_layers);
+    printf("Layers:\n");
+    for(u32 i = 0; i < pd_darray_r_size(_layers); i++) {
+        printf("  %d: %s\n", i, (const char*) pd_darray_at(_layers, i));
+    }
 }
