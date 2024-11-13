@@ -213,7 +213,7 @@ static void vk_messenger_create_info_init(
 #endif // PD_USE_DEBUG
 
 static b32 vk_are_required_exts_present(const pd_darray* _supported_exts,
-                                       const pd_darray* _req_exts) {
+                                        const pd_darray* _req_exts) {
     PD_expect_nonnull(_supported_exts);
     PD_expect_nonnull(_req_exts);
     return pd_darray_contains_array(
@@ -222,7 +222,7 @@ static b32 vk_are_required_exts_present(const pd_darray* _supported_exts,
 }
 
 static b32 vk_are_requested_layers_present(const pd_darray* _supported_layers,
-                                          const pd_darray* _req_layers) {
+                                           const pd_darray* _req_layers) {
     PD_expect_nonnull(_supported_layers);
     PD_expect_nonnull(_req_layers);
     return (pd_darray_r_size(_req_layers) > 0)?
