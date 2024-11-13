@@ -21,10 +21,10 @@ ifeq ($(OS),Darwin)
 endif # Darwin
 ifeq ($(OS),Linux)
 	volk_defs = -DVK_USE_PLATFORM_XLIB_KHR
-endif # Darwin
+endif # Linux
 ifeq ($(OS),Windows_NT)
 	volk_defs = -DVK_USE_PLATFORM_WIN32_KHR
-endif # Darwin
+endif # Windows_NT
 
 # compiler flags
 std = -std=c11
