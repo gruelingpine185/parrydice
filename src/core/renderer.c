@@ -16,6 +16,8 @@ static b32 vk_r_supported_exts(pd_darray* _exts);
 static b32 vk_r_supported_layers(pd_darray* _layers);
 #if PD_USE_DEBUG
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
+static b32 vk_create_messenger(VkInstance _instance,
+                               VkDebugUtilsMessengerEXT* _messenger);
 static VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_msg_cb(
     VkDebugUtilsMessageSeverityFlagBitsEXT _severity,
     VkDebugUtilsMessageTypeFlagsEXT _type,
@@ -153,6 +155,20 @@ static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
     }
 
     printf("\n");
+}
+
+static b32 vk_create_messenger(VkInstance _instance,
+                               VkDebugUtilsMessengerEXT* _messenger) {
+    PD_expect_nonnull(_instance);
+    PD_expect_nonnull(_messenger);
+    VkDebugUtilsMessengerCreateInfoEXT create_info;
+    vk_messenger_create_info_init(&create_info, &vk_debug_msg_cb);
+    VkResult res = vkCreateDebugUtilsMessengerEXT(
+        _instance,
+        &create_info,
+        VK_NULL_HANDLE,
+        _messenger);
+    return (res == VK_SUCCESS);
 }
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_msg_cb(
@@ -342,10 +358,21 @@ b32 pd_renderer_init(pd_renderer* _renderer) {
     if(!vk_create_instance(&_renderer->instance)) return 0;
 
     volkLoadInstance(_renderer->instance);
+#if PD_USE_DEBUG
+    if(!vk_create_messenger(_renderer->instance, &_renderer->messenger)) {
+        return 0;
+    }
+#endif // pD_USE_DEBUG
     return 1;
 }
 
 void pd_renderer_deinit(pd_renderer* _renderer) {
     PD_expect_nonnull(_renderer);
+#if PD_USE_DEBUG
+    vkDestroyDebugUtilsMessengerEXT(
+        _renderer->instance,
+        _renderer->messenger,
+        VK_NULL_HANDLE);
+#endif // PD_USE_DEBUG
     vkDestroyInstance(_renderer->instance, VK_NULL_HANDLE);
 }
