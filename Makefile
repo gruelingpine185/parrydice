@@ -20,7 +20,7 @@ ifeq ($(OS),Darwin)
 	volk_defs = -DVK_USE_PLATFORM_MACOS_MVK
 endif # Darwin
 ifeq ($(OS),Linux)
-	volk_defs = -VK_USE_PLATFORM_XLIB_KHR
+	volk_defs = -DVK_USE_PLATFORM_XLIB_KHR
 endif # Darwin
 ifeq ($(OS),Windows_NT)
 	volk_defs = -DVK_USE_PLATFORM_WIN32_KHR
