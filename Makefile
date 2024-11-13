@@ -18,9 +18,9 @@ objects := $(patsubst $(src_dir)/%.c,$(bin_dir)/%.o,$(sources))
 std = -std=c11
 opt = -O0 -g
 wrn = -Wall -Wextra -pedantic
-inc = -I$(inc_dir) $(shell pkg-config --cflags glfw3)
-def ?= -DPD_USE_DEBUG=1 -DPD_USE_EXPECT=1
-libs := $(shell pkg-config --libs --static glfw3) -Wl,-rpath,/usr/local/lib -lvulkan
+inc = -I$(inc_dir) -I$(vnd_dir) $(shell pkg-config --cflags glfw3)
+def ?= -DPD_USE_DEBUG=1 -DPD_USE_EXPECT=1 -DVK_USE_PLATFORM_MACOS_MVK
+libs := $(shell pkg-config --libs --static glfw3) 
 flags := $(strip $(std) $(opt) $(wrn) $(inc) $(def))
 
 .PHONY: all clean deps_install deps_uninstall
@@ -35,7 +35,7 @@ deps_uninstall:
 	xargs rm < $(vnd_dir)/glfw/build/install_manifest.txt
 
 $(project): $(headers) $(sources) $(bin_dirs) $(objects)
-	$(CC) $(flags) $(objects) -o $@ $(libs)
+	$(CC) $(flags) $(objects) $(vnd_dir)/volk/volk.c -o $@ $(libs)
 
 $(bin_dir)/%.o: $(src_dir)/%.c $(bin_dirs)
 	$(CC) $(flags) -c $< -o $@

@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include <GLFW/glfw3.h>
-#include <vulkan/vulkan.h>
+#include <volk/volk.h>
 
 #include "utils/expect.h"
 #include "utils/darray.h"
@@ -247,8 +247,10 @@ static b32 vk_create_instance(VkInstance* _instance) {
 
 b32 pd_renderer_init(pd_renderer* _renderer) {
     PD_expect_nonnull(_renderer);
+    if(volkInitialize() != VK_SUCCESS) return 0;
     if(!vk_create_instance(&_renderer->instance)) return 0;
 
+    volkLoadInstance(_renderer->instance);
     return 1;
 }
 
