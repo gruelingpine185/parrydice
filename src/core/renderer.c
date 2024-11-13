@@ -16,6 +16,11 @@ static b32 vk_r_supported_exts(pd_darray* _exts);
 static b32 vk_r_supported_layers(pd_darray* _layers);
 #if PD_USE_DEBUG
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
+static VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_msg_cb(
+    VkDebugUtilsMessageSeverityFlagBitsEXT _severity,
+    VkDebugUtilsMessageTypeFlagsEXT _type,
+    const VkDebugUtilsMessengerCallbackDataEXT* _cb_data,
+    void* _user_data);
 static const char* vk_msg_type_as_str(VkDebugUtilsMessageTypeFlagsEXT _type);
 static const char* vk_msg_severity_as_str(VkDebugUtilsMessageSeverityFlagBitsEXT _severity);
 static void vk_messenger_create_info_init(
@@ -149,6 +154,26 @@ static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
 
     printf("\n");
 }
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL vk_debug_msg_cb(
+    VkDebugUtilsMessageSeverityFlagBitsEXT _severity,
+    VkDebugUtilsMessageTypeFlagsEXT _type,
+    const VkDebugUtilsMessengerCallbackDataEXT* _cb_data,
+    void* _user_data) {
+    if(_severity < VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT) {
+        return VK_FALSE;
+    }
+
+    fprintf(
+        stderr,
+        "[%s] %s: %s\n",
+        vk_msg_severity_as_str(_severity),
+        vk_msg_type_as_str(_type),
+        _cb_data->pMessage);
+    (void) _user_data;
+    return VK_FALSE;
+}
+
 static const char* vk_msg_type_as_str(VkDebugUtilsMessageTypeFlagsEXT _type) {
     const char* type = "Unknown Message Type";
     switch(_type) {
