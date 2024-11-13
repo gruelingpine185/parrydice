@@ -3,6 +3,7 @@
 
 #include "utils/defines.h"
 #include "utils/types.h"
+#include "core/renderer.h"
 
 typedef struct GLFWwindow GLFWwindow;
 
@@ -10,6 +11,7 @@ typedef struct pd_window pd_window;
 
 struct pd_window {
     GLFWwindow* handle;
+    pd_renderer renderer;
     const char* title;
     i32 w;
     i32 h;

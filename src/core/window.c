@@ -15,12 +15,16 @@ b32 pd_window_init(pd_window* _win, const char* _title, i32 _w, i32 _h) {
 
     glfwGetWindowSize(_win->handle, &_win->w, &_win->h);
     _win->title = _title;
+    
+    if(!pd_renderer_init(&_win->renderer)) return 0;
+
     return 1;
 }
 
 void pd_window_deinit(pd_window* _win) {
     PD_expect_nonnull(_win);
     PD_expect_nonnull(_win->handle);
+    pd_renderer_deinit(&_win->renderer);
     glfwDestroyWindow(_win->handle);
     glfwTerminate();
 }
