@@ -53,9 +53,9 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
     if(!glfw_exts) return 0;
 
 #if __APPLE__
-    if(!pd_darray_init(_exts, count + 1)) return 0;
+    if(!pd_darray_init(_exts, count + 2)) return 0;
 #else
-    if(!pd_darray_init(_exts, count)) return 0;
+    if(!pd_darray_init(_exts, count + 1)) return 0;
 #endif // __APPLE__
 
     const char* ext = NULL;
@@ -338,6 +338,12 @@ static b32 vk_create_instance(VkInstance* _instance) {
     pd_darray_deinit_all(&supported_exts);
     pd_darray_deinit_all(&supported_layers);
 #endif // PD_USE_DEBUG
+
+    VkDebugUtilsMessengerCreateInfoEXT messenger_create_info;
+    vk_messenger_create_info_init(&messenger_create_info, NULL);
+    messenger_create_info.pNext =
+        (VkDebugUtilsMessengerCreateInfoEXT*) &messenger_create_info;
+    // TODO: Finish setting up debugging for vkCreateInstance()
 
     VkApplicationInfo app_info;
     vk_application_info_init(&app_info, "Parrydice");
