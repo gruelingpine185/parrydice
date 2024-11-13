@@ -16,6 +16,11 @@ static b32 vk_r_supported_exts(pd_darray* _exts);
 static b32 vk_r_supported_layers(pd_darray* _layers);
 #if PD_USE_DEBUG
 static void vk_print_str_darray(const pd_darray* _arr, const char* _title);
+static const char* vk_msg_type_as_str(VkDebugUtilsMessageTypeFlagsEXT _type);
+static const char* vk_msg_severity_as_str(VkDebugUtilsMessageSeverityFlagBitsEXT _severity);
+static void vk_messenger_create_info_init(
+    VkDebugUtilsMessengerCreateInfoEXT* _create_info,
+    PFN_vkDebugUtilsMessengerCallbackEXT _cb);
 #endif // PD_USE_DEBUG
 static b32 vk_are_required_exts_present(const pd_darray* _supported_exts,
                                        const pd_darray* _req_exts);
@@ -143,6 +148,67 @@ static void vk_print_str_darray(const pd_darray* _arr, const char* _title) {
     }
 
     printf("\n");
+}
+static const char* vk_msg_type_as_str(VkDebugUtilsMessageTypeFlagsEXT _type) {
+    const char* type = "Unknown Message Type";
+    switch(_type) {
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT:
+            type = "General";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT:
+            type = "Validation";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT:
+            type = "Device Address Binding";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT:
+            type = "Performance";
+            break;
+        default: break;
+    }
+
+    return type;
+}
+
+static const char* vk_msg_severity_as_str(VkDebugUtilsMessageSeverityFlagBitsEXT _severity) {
+    const char* severity = "Unknown Message Severity";
+    switch(_severity) {
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+            severity = "Verbose";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+            severity = "Info";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+            severity = "Warning";
+            break;
+        case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+            severity = "Error";
+            break;
+        default: break;
+    }
+
+    return severity;
+}
+
+static void vk_messenger_create_info_init(
+    VkDebugUtilsMessengerCreateInfoEXT* _create_info,
+    PFN_vkDebugUtilsMessengerCallbackEXT _cb) {
+    PD_expect_nonnull(_create_info);
+    _create_info->sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+    _create_info->pNext = VK_NULL_HANDLE;
+    _create_info->flags = 0;
+    _create_info->messageSeverity =
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+    _create_info->messageType =
+        VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT |
+        VK_DEBUG_UTILS_MESSAGE_TYPE_DEVICE_ADDRESS_BINDING_BIT_EXT;
+    _create_info->pfnUserCallback = _cb;
+    _create_info->pUserData = VK_NULL_HANDLE;
 }
 #endif // PD_USE_DEBUG
 
