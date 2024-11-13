@@ -272,7 +272,6 @@ static b32 vk_are_requested_layers_present(const pd_darray* _supported_layers,
             _req_layers,
             &pd_darray_is_str_eq):
         1;
-        
 }
 
 static void vk_application_info_init(VkApplicationInfo* _app_info,
