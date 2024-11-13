@@ -14,12 +14,24 @@ headers := $(wildcard $(inc_dir)/*.h) $(wildcard $(inc_dir)/**/*.h)
 sources := $(wildcard $(src_dir)/*.c) $(wildcard $(src_dir)/**/*.c)
 objects := $(patsubst $(src_dir)/%.c,$(bin_dir)/%.o,$(sources))
 
+volk_defs =
+OS ?= $(shell uname -s)
+ifeq ($(OS),Darwin)
+	volk_defs = -DVK_USE_PLATFORM_MACOS_MVK
+endif # Darwin
+ifeq ($(OS),Linux)
+	volk_defs = -DVK_USE_PLATFORM_XLIB_KHR
+endif # Linux
+ifeq ($(OS),Windows_NT)
+	volk_defs = -DVK_USE_PLATFORM_WIN32_KHR
+endif # Windows_NT
+
 # compiler flags
 std = -std=c11
 opt = -O0 -g
 wrn = -Wall -Wextra -pedantic
 inc = -I$(inc_dir) -I$(vnd_dir) $(shell pkg-config --cflags glfw3)
-def ?= -DPD_USE_DEBUG=1 -DPD_USE_EXPECT=1 -DVK_USE_PLATFORM_MACOS_MVK
+def ?= -DPD_USE_DEBUG=1 -DPD_USE_EXPECT=1 $(volk_defs)
 libs := $(shell pkg-config --libs --static glfw3) 
 flags := $(strip $(std) $(opt) $(wrn) $(inc) $(def))
 
