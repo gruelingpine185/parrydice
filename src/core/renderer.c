@@ -9,6 +9,7 @@
 #include "utils/darray.h"
 #include "core/renderer.h"
 
+static char* pd_strdup(const char* _str);
 static b32 pd_darray_is_str_eq(const void* _l, const void* _r);
 static b32 vk_r_instance_exts(pd_darray* _exts);
 static b32 vk_r_instance_layers(pd_darray* _layers);
@@ -42,6 +43,14 @@ static void vk_instance_create_info_init(VkInstanceCreateInfo* _create_info,
 static b32 vk_create_instance(VkInstance* _instance);
 
 
+static char* pd_strdup(const char* _str) {
+    usize size = strlen(_str) + 1;
+    char* str = (char*) malloc(size);
+    if(!str) return NULL;
+
+    return (char*) memcpy(str, _str, size);
+}
+
 static b32 pd_darray_is_str_eq(const void* _l, const void* _r) {
     return (strcmp((const char*) _l, (const char*) _r) == 0);
 }
@@ -60,19 +69,19 @@ static b32 vk_r_instance_exts(pd_darray* _exts) {
 
     const char* ext = NULL;
 #if PD_USE_DEBUG
-    ext = strdup(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+    ext = pd_strdup(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     if(!ext) return 0;
     if(!pd_darray_append(_exts, (void*) ext)) return 0;
 #endif // PD_USE_DEBUG
 
     for(u32 i = 0; i < count; i++) {
-        ext = strdup(glfw_exts[i]);
+        ext = pd_strdup(glfw_exts[i]);
         if(!ext) return 0;
         if(!pd_darray_append(_exts, (void*) ext)) return 0;
     }
 
 #if __APPLE__
-    ext = strdup(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
+    ext = pd_strdup(VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME);
     if(!ext) return 0;
     if(!pd_darray_append(_exts, (void*) ext)) return 0;
 #endif // __APPLE__
@@ -86,7 +95,7 @@ static b32 vk_r_instance_layers(pd_darray* _layers) {
     const u32 count = 1;
    if(!pd_darray_init(_layers, count)) return 0;
 
-    const char* layer = strdup("VK_LAYER_KHRONOS_validation");
+    const char* layer = pd_strdup("VK_LAYER_KHRONOS_validation");
     if(!layer) return 0;
 
     return pd_darray_append(_layers, (void*) layer);
@@ -115,7 +124,7 @@ static b32 vk_r_supported_exts(pd_darray* _exts) {
     if(!pd_darray_init(_exts, property_count)) return 0;
 
     for(u32 i = 0; i < property_count; i++) {
-        const char* ext = strdup(props[i].extensionName);
+        const char* ext = pd_strdup(props[i].extensionName);
         if(!ext) return 0;
         if(!pd_darray_append(_exts, (void*) ext)) return 0;
     }
@@ -137,7 +146,7 @@ static b32 vk_r_supported_layers(pd_darray* _layers) {
     if(!pd_darray_init(_layers, property_count)) return 0;
 
     for(u32 i = 0; i < property_count; i++) {
-        const char* layer = strdup(props[i].layerName);
+        const char* layer = pd_strdup(props[i].layerName);
         if(!layer) return 0;
         if(!pd_darray_append(_layers, (void*) layer)) return 0;
     }
